@@ -225,6 +225,9 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         # elif f != 'None':
         #     where_clause = f" where {f}"
         # sql += where_clause
+
+        print('------yuadebug-------dd-----')
+        print(sql)
         df = spark.sql(sql)
         return df
 
