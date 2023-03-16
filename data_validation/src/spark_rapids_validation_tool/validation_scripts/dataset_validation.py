@@ -128,7 +128,7 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
             where_clause = f" where {t1p} and {f}"
         elif t1p != 'None':
             where_clause = f" where {t1p}"
-        elif t1f != 'None':
+        elif f != 'None':
             where_clause = f" where {f}"
         sql += where_clause
 
