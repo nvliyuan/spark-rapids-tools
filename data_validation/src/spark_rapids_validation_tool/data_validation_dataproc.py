@@ -119,7 +119,7 @@ class DataValidationDataproc(Validation):
                 f'--t2p={self.table2_partition}',
                 f'--i={self.convert_tuple_to_string(self.included_column)}',
                 f'--pk={self.pk}',
-                f'--e={self.convert_tuple_to_string(self.excluded_column)}',
+                f'--e={self.excluded_column}',
                 f'--f={self.filter}',
                 f'--o={self.output_dir}',
                 f'--of={self.output_format}',
