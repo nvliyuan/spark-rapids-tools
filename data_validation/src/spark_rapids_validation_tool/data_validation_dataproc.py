@@ -115,7 +115,7 @@ class DataValidationDataproc(Validation):
                 f'--t1={self.table1}',
                 f'--t2={self.table2}',
                 f'--format={self.format}',
-                f'--t1p={self.table2_partition}',
+                f'--t1p={self.table1_partition}',
                 f'--t2p={self.table2_partition}',
                 f'--i={self.convert_tuple_to_string(self.included_column)}',
                 f'--pk={self.pk}',
