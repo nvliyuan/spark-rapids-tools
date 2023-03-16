@@ -202,9 +202,9 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         print('-------yuadebug-normal_cols-----')
         print(normal_cols)
         for c in normal_cols:
-            cond.append("t1." + c != "t2." + c)
+            cond.append(col("t1." + c) != col("t2." + c))
         for c in map_cols:
-            cond.append(map_to_string("t1." + c) != map_to_string("t2." + c))
+            cond.append(map_to_string(col("t1." + c)) != map_to_string(col("t2." + c)))
         print('-------yuadebug-cond-----')
         print(cond)
         select_columns = [col('t1.' + p) for p in pk.split(',')] + [(col('t1.' + c).alias('t1_'+ c), col('t2.' + c).alias('t2_' + c)) for c in
