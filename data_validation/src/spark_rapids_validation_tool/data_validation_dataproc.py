@@ -126,7 +126,8 @@ class DataValidationDataproc(Validation):
                 f'--p={self.precision}'
             ]
         }
-        self.cluster.submit_job(compare_job)
+        output = self.cluster.submit_job(compare_job)
+        print(output)
 
 def main():
     """Main function."""
