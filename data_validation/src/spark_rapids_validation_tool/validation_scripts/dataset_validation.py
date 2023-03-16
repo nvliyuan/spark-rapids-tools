@@ -241,10 +241,12 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         print(result)
     elif format == "hive":
 
-        if i in ['None', 'all']:
-            i = "*"
         excluded_columns_list = [exclude_column.strip() for exclude_column in e.split(",")]
-        select_column = [include_column.strip() for include_column in i.split(",") if i not in excluded_columns_list]
+        if i in ['None', 'all']:
+            select_column = "*"
+        else:
+            select_column = [include_column.strip() for include_column in i.split(",") if
+                             i not in excluded_columns_list]
         sql = f"select {pk},{select_column} from {t1} "
 
         if any(cond != 'None' for cond in [t1p, f]):
