@@ -25,11 +25,11 @@ def validation(spark, args):
         return
 
     # valid PK(s) only in table1
-    result = valid_pk_only_in_one_table(spark, args.format, args.t1, args.t2, args.t1p, args.t2p, args.t1f, args.pk, args.e, args.i, args.f, args.o, args.of)
+    result = valid_pk_only_in_one_table(spark, args.format, args.t1, args.t2, args.t1p, args.t2p, args.pk, args.e, args.i, args.f, args.o, args.of)
     print(f"PK(s) only in {args.t1} :")
     print(result.show())
     # valid PK(s) only in table2
-    result = valid_pk_only_in_one_table(spark, args.format, args.t2, args.t1, args.t1p, args.t2p, args.t1f, args.pk, args.e, args.i, args.f, args.o, args.of)
+    result = valid_pk_only_in_one_table(spark, args.format, args.t2, args.t1, args.t1p, args.t2p, args.pk, args.e, args.i, args.f, args.o, args.of)
     print(f"PK(s) only in {args.t2} :")
     print(result.show())
 
@@ -124,12 +124,12 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, t1f, pk, e, i, f
     elif format == "hive":
         sql = f"select {pk} from {t1} except select {pk} from {t2}"
         where_clause = ""
-        if t1p != 'None' and t1f !='None':
-            where_clause = f" where {t1p} and {t1f}"
+        if t1p != 'None' and f !='None':
+            where_clause = f" where {t1p} and {f}"
         elif t1p != 'None':
             where_clause = f" where {t1p}"
         elif t1f != 'None':
-            where_clause = f" where {t1f}"
+            where_clause = f" where {f}"
         sql += where_clause
 
         print('------yua-debug-validat-----')
