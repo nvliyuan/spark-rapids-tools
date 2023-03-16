@@ -212,7 +212,11 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
                                                                c not in excluded_columns_list]
         print('-------yuadebug-select_columns-----')
         print(select_columns)
-        result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
+        print('-------yuadebug-joined_table-----')
+
+        print(joined_table)
+        return joined_table
+        # result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
 
         # if partitions != 'None':
         #     partitions = [p.strip() for p in partitions.split("and")]
@@ -225,7 +229,7 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         # Execute the query and return the result
         # result = spark.sql(sql)
 
-        return result_table
+        # return result_table
 
 def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
     if format in ['parquet', 'orc', 'csv']:
