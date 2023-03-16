@@ -14,9 +14,11 @@
 
 import argparse
 from pyspark import SparkContext        # pylint: disable=import-error
-from pyspark.sql import SparkSession    # pylint: disable=import-error
+from pyspark.sql import SparkSession, DataFrame, functions as F    # pylint: disable=import-error
 from pyspark.sql.functions import col   # pylint: disable=import-error
 import time
+from pyspark.sql.types import *
+import fnmatch
 
 def validation(spark, args):
 
@@ -34,12 +36,13 @@ def validation(spark, args):
     print(result.show())
 
     # valid result table with the same PK but different values for that column(s)
-    # result = get_cols_diff_with_same_pk(spark, args.format, args.t1, args.t2, args.pk, args.t1p, args.f, args.i, args.e)
+    result = get_cols_diff_with_same_pk(spark, args.format, args.t1, args.t2, args.pk, args.t1p, args.t2p, args.f, args.i, args.e, args.p)
     # print("columns with same PK(s) but diff values : ")
     # print(result.show())
     #
     # start_time = time.time()
     print('------------run validation success-----')
+
 
 def valid_input(spark, args):
     """
@@ -124,10 +127,7 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
     elif format == "hive":
         sql1 = f"select {pk} from {t1} "
         sql2 = f"select {pk} from {t2} "
-        print('-----yuadebug---')
-        print(t1p)
-        print(t2p)
-        print(f)
+
         if any(cond != 'None' for cond in [t1p,f]):
             where_clause = ' where ' + ' and '.join(x for x in [t1p, f] if x != 'None')
             sql1 += where_clause
@@ -136,14 +136,13 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
             sql2 += where_clause
 
         sql = sql1 + " except " + sql2
-        print('-----yuadebug---')
-        print(sql)
+
         result = spark.sql(sql)
         return result
 
     return
 
-def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, partitions, filter, included_columns, excluded_columns):
+def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p, t2p, filter, included_columns, excluded_columns, p):
     if format in ['parquet', 'orc', 'csv']:
         pk_list = [i.strip() for i in pk.split(",")]
         included_columns_list = [i.strip() for i in included_columns.split(",")]
@@ -156,9 +155,9 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, part
                     FULL OUTER JOIN table2 t2 ON {' AND '.join([f't1.{c} = t2.{c}' for c in pk_list])}
                     WHERE ({' or '.join([f't1.{c} <> t2.{c}' for c in included_columns_list if c not in excluded_columns_list])} )
                 """
-        if partitions != 'None':
-            partitions = [p.strip() for p in partitions.split("and")]
-            sql += ' AND ( ' + ' AND '.join([f't1.{p} ' for p in partitions]) + ' )'
+        if t1p != 'None':
+            t1p = [p.strip() for p in t1p.split("and")]
+            sql += ' AND ( ' + ' AND '.join([f't1.{p} ' for p in t1p]) + ' )'
 
         if filter != 'None':
             filters = [f.strip() for f in filter.split("and")]
@@ -169,7 +168,52 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, part
 
         return result
     elif format == "hive":
-        print("----todo---hive-load_table-")
+        # todo: convert nested type to string using udf
+        pk_list = [i.strip() for i in pk.split(",")]
+        included_columns_list = [i.strip() for i in included_columns.split(",")]
+        excluded_columns_list = [e.strip() for e in excluded_columns.split(",")]
+        @F.udf(returnType=StringType())
+        def map_to_string(data):
+            # Sort the keys and values in the map
+            sorted_data = sorted(data.items(), key=lambda x: x[0]) if isinstance(data, dict) else sorted(
+                [(k, sorted(v)) for k, v in data.items()], key=lambda x: x[0])
+            return str(dict(sorted_data))
+
+        table_DF1 = load_table(spark, format, table1_name, t1p, pk, excluded_columns, included_columns, filter, "table1")
+        table_DF2 = load_table(spark, format, table2_name, t2p, pk, excluded_columns, included_columns, filter, "table2")
+
+        joined_table = table_DF1.alias("t1").join(table_DF2.alias("t2"), pk_list)
+
+        map_cols = []
+        cond = True
+        for c in table_DF1.schema.fields:
+            # here only excluded 'date' because it will raise exception, we also should excluded str/map/nested
+            if (any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in
+                    ['map'])):
+                map_cols += c.name
+        normal_cols = list(set(table_DF1.columns) - set(map_cols))
+        for c in normal_cols:
+            cond = cond | ("t1." + c != "t2." + c)
+        for c in map_cols:
+            cond = cond | (map_to_string("t1." + c) != map_to_string("t2." + c))
+
+        select_columns = [col('t1.' + p) for p in pk.split(',')] + [(col('t1.' + c).alias('t1_'+ c), col('t2.' + c).alias('t2_' + c)) for c in
+                                                               included_columns_list if
+                                                               c not in excluded_columns_list]
+        result_table = joined_table.select(select_columns).where(cond)
+
+        # if partitions != 'None':
+        #     partitions = [p.strip() for p in partitions.split("and")]
+        #     sql += ' AND ( ' + ' AND '.join([f't1.{p} ' for p in partitions]) + ' )'
+        #
+        # if filter != 'None':
+        #     filters = [f.strip() for f in filter.split("and")]
+        #     sql += ' AND ( ' + ' AND '.join([f't1.{f} ' for f in filters]) + ' )'
+
+        # Execute the query and return the result
+        # result = spark.sql(sql)
+
+        return result_table
 
 def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
     if format in ['parquet', 'orc', 'csv']:
@@ -196,7 +240,21 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         # print(result)
         print(result)
     elif format == "hive":
-        print("----todo---hive-load_table-")
+
+        if i in ['None', 'all']:
+            i = "*"
+        excluded_columns_list = [exclude_column.strip() for exclude_column in e.split(",")]
+        select_column = [include_column.strip() for include_column in i.split(",") if i not in excluded_columns_list]
+        sql = f"select {pk},{select_column} from {t1} "
+
+        if any(cond != 'None' for cond in [t1p, f]):
+            where_clause = ' where ' + ' and '.join(x for x in [t1p, f] if x != 'None')
+            sql1 += where_clause
+        print("--yuadebug----load hive table--")
+        print(sql)
+        result = spark.sql(sql)
+        return result
+
 
 def partition_to_path(partition_str, path):
     partition = {}
@@ -205,7 +263,6 @@ def partition_to_path(partition_str, path):
         partition = dict(item.split("=") for item in partition_items)
     partition_path = "/".join([f"{col}={val}" for col, val in partition.items()])
     return f"{path}/{partition_path}".replace(" ", "")
-
 
 if __name__ == '__main__':
 

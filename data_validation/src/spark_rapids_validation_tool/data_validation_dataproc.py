@@ -128,9 +128,6 @@ class DataValidationDataproc(Validation):
             ]
         }
 
-        print('----ddddd----')
-        print(self.filter)
-        print(self.format_conf_with_quotation(self.filter))
         output = self.cluster.submit_job(compare_job)
         print(output)
 
