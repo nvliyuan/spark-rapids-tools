@@ -214,8 +214,8 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         print(select_columns)
         print('-------yuadebug-joined_table-----')
 
-        return joined_table.select(select_columns)
-        # return joined_table.select([col('t1.col1').alias("table1_pk"),col('t1.col2').alias("t1col2"),col('t2.col2').alias("t2col2")])
+        return joined_table.select(select_columns) # does not work??
+        # return joined_table.select([col('t1.col1').alias("table1_pk"),col('t1.col2').alias("t1col2"),col('t2.col2').alias("t2col2")]) # works well
         # result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
 
         # if partitions != 'None':
