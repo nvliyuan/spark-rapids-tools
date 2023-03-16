@@ -189,12 +189,11 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         map_cols = []
         cond = True
         for c in table_DF1.schema.fields:
-            print('----------')
+            print('-----able_DF1.schema.fields-----')
             print(c)
             if (any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in
                     ['map'])):
-                print('----------')
-
+                print('-----fnmatch.fnmatch-----')
                 map_cols += c.name
         print('-------yuadebug-map_cols-----')
         print(map_cols)
