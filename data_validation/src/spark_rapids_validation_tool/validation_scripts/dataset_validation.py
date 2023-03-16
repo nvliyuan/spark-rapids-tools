@@ -215,7 +215,7 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         print('-------yuadebug-joined_table-----')
 
         print(joined_table)
-        return joined_table
+        return joined_table.select(select_columns)
         # result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
 
         # if partitions != 'None':
