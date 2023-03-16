@@ -184,7 +184,7 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         table_DF2 = load_table(spark, format, table2_name, t2p, pk, excluded_columns, included_columns, filter, "table2")
 
         if included_columns == 'all':
-            included_columns_list = list(set(included_columns_list) - set(excluded_columns_list) - set(pk_list))
+            included_columns_list = list(set(table_DF1.columns) - set(excluded_columns_list) - set(pk_list))
         joined_table = table_DF1.alias("t1").join(table_DF2.alias("t2"), pk_list)
 
         map_cols = []
