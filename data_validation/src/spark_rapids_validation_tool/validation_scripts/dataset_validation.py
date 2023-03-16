@@ -249,7 +249,7 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
 
         if any(cond != 'None' for cond in [t1p, f]):
             where_clause = ' where ' + ' and '.join(x for x in [t1p, f] if x != 'None')
-            sql1 += where_clause
+            sql += where_clause
         print("--yuadebug----load hive table--")
         print(sql)
         result = spark.sql(sql)
