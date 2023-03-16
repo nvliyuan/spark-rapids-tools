@@ -134,7 +134,7 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
 
         print('------yua-debug-validat-----')
         print(sql)
-        result = spark.sql(sql)
+        result = spark.sql(sql+"ddd")
         return result
 
     return 0
