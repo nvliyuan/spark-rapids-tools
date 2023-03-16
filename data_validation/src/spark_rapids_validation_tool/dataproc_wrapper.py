@@ -66,11 +66,14 @@ class DataprocWrapper(object):
 
         validate = DataValidationDataproc(cluster, region, check, format, t1, t1p, t2, t2p, pk, e, i, f, o, of, p, debug)
 
-        if any(p is None for p in [cluster, region, t1, t2, pk, format]):
-            print('|--cluster/region/format/t1/t2/pk should not be none--|')
+        if any(p is None for p in [cluster, region, t1, t2, format]):
+            print('|--cluster/region/format/t1/t2 should not be none--|')
             return
         if format not in ['hive', 'orc', 'parquet', 'csv']:
             print('|--format should be one of hive/parquet/orc/csv--|')
+            return
+        if check == 'valid_data' and pk is None:
+            print('|--pk should be not be none if running valid_data--|')
             return
         getattr(validate, check)()
 
