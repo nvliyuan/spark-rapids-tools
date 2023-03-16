@@ -190,7 +190,7 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         cond = True
         for c in table_DF1.schema.fields:
             print('-----able_DF1.schema.fields-----')
-            print(c)
+            print(c.dataType.simpleString())
             if (any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in
                     ['map'])):
                 print('-----fnmatch.fnmatch-----')
