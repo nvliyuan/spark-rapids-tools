@@ -14,8 +14,6 @@
 
 """Wrapper class to run tools associated with RAPIDS Accelerator for Apache Spark plugin."""
 import fire
-import argparse
-
 from spark_rapids_validation_tool.data_validation_dataproc import DataValidationDataproc
 
 class DataprocWrapper(object):
@@ -71,9 +69,10 @@ class DataprocWrapper(object):
         if any(p is None for p in [cluster, region, t1, t2, pk, format]):
             print('|--cluster/region/format/t1/t2/pk should not be none--|')
             return
-
+        if format not in ['hive', 'orc', 'parquet', 'csv']:
+            print('|--format should be one of hive/parquet/orc/csv--|')
+            return
         getattr(validate, check)()
-
 
 def main():
     fire.Fire(DataprocWrapper)
