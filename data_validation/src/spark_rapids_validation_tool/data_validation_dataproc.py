@@ -53,11 +53,11 @@ class DataValidationDataproc(Validation):
         self.valid_metadata()
         self.valid_data()
 
-    def format_conf_with_quotation(self,conf):
-        if conf is None:
-            return 'None'
-        else:
-            return conf.replace('\'', '\\\'')
+    # def format_conf_with_quotation(self,conf):
+    #     if conf is None:
+    #         return 'None'
+    #     else:
+    #         return conf.replace('\'', '\\\'')
 
     @on('master')  # pylint: disable=too-many-function-args
     def valid_metadata(self):
