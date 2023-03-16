@@ -25,11 +25,11 @@ def validation(spark, args):
         return
 
     # valid PK(s) only in table1
-    result = valid_pk_only_in_one_table(spark, args.format, args.t1, args.t2, args.t1p, args.t2p, args.pk, args.e, args.i, args.f, args.o, args.of)
+    result = valid_pk_only_in_one_table(spark, args.format, args.t1, args.t2, args.t1p, args.t2p, args.t1f, args.pk, args.e, args.i, args.f, args.o, args.of)
     print(f"PK(s) only in {args.t1} :")
     print(result.show())
     # valid PK(s) only in table2
-    result = valid_pk_only_in_one_table(spark, args.format, args.t2, args.t1, args.t1p, args.t2p, args.pk, args.e, args.i, args.f, args.o, args.of)
+    result = valid_pk_only_in_one_table(spark, args.format, args.t2, args.t1, args.t1p, args.t2p, args.t1f, args.pk, args.e, args.i, args.f, args.o, args.of)
     print(f"PK(s) only in {args.t2} :")
     print(result.show())
 
@@ -108,7 +108,7 @@ def valid_metadata_included_column(spark, args):
 #         print("----todo---hive--")
 #         return 0
 
-def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, of):
+def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, t1f, pk, e, i, f, o, of):
     """valid PK(s) only in one table"""
     if format in ['parquet', 'orc', 'csv']:
 
