@@ -69,7 +69,8 @@ class DataprocWrapper(object):
         validate = DataValidationDataproc(cluster, region, check, format, t1, t1p, t2, t2p, pk, e, i, f, o, of, p, debug)
 
         if any(p is None for p in [cluster, region, t1, t2, pk, format]):
-            raise argparse.ArgumentTypeError('|--cluster/region/format/t1/t2/pk should not be none--|')
+            print('|--cluster/region/format/t1/t2/pk should not be none--|')
+            return
 
         getattr(validate, check)()
 
