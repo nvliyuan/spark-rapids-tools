@@ -108,7 +108,7 @@ def valid_metadata_included_column(spark, args):
 #         print("----todo---hive--")
 #         return 0
 
-def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, t1f, pk, e, i, f, o, of):
+def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, of):
     """valid PK(s) only in one table"""
     if format in ['parquet', 'orc', 'csv']:
 
