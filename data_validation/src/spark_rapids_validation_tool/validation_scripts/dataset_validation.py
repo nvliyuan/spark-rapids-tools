@@ -240,14 +240,14 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         # print(result)
         print(result)
     elif format == "hive":
-
         excluded_columns_list = [exclude_column.strip() for exclude_column in e.split(",")]
         if i in ['None', 'all']:
-            select_column = "*"
+            sql = f"select * from {t1} "
         else:
-            select_column = [include_column.strip() for include_column in i.split(",") if
-                             i not in excluded_columns_list]
-        sql = f"select {pk},{select_column} from {t1} "
+            # select_column = [include_column.strip() for include_column in i.split(",") if
+            #                  i not in excluded_columns_list]
+            # select_column_str = select_column
+            sql = f"select {pk},{i} from {t1} "
 
         if any(cond != 'None' for cond in [t1p, f]):
             where_clause = ' where ' + ' and '.join(x for x in [t1p, f] if x != 'None')
