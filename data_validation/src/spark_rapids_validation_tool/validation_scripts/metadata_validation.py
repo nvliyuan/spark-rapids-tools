@@ -212,16 +212,19 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         cols = '*' if i is None or i == 'all' else i
         sql = f"select {cols} from {t1}"
         # where clause
-        where_clause = ""
-        if t1p != 'None' and f != 'None':
-            where_clause = f" where {t1p} and {f}"
-        elif t1p != 'None':
-            where_clause = f" where {t1p}"
-            # partition clause should be in real order as data path
-            # path += partition_to_path(t1p)
-        elif f != 'None':
-            where_clause = f" where {f}"
-        sql += where_clause
+        if any(cond != 'None' for cond in [t1p,f]):
+            where_clause = ' where ' + ' and '.join(x for x in [t1p, f] if x != 'None')
+            sql += where_clause
+
+        # if t1p != 'None' and f != 'None':
+        #     where_clause = f" where {t1p} and {f}"
+        # elif t1p != 'None':
+        #     where_clause = f" where {t1p}"
+        #     # partition clause should be in real order as data path
+        #     # path += partition_to_path(t1p)
+        # elif f != 'None':
+        #     where_clause = f" where {f}"
+        # sql += where_clause
         df = spark.sql(sql)
         return df
 
