@@ -92,16 +92,20 @@ def top_level_metadata(spark, format, t1, t2, t1p, t2p, f):
         print('todo')
     elif format == "hive":
         results = []
-        table_names = [t1, t2]
-        where_clause = ''
-        if t1p != 'None' and f != 'None':
-            where_clause = f" where {t1p} and {f}"
-        elif t1p != 'None':
-            where_clause = f" where {t1p}"
-        elif f != 'None':
-            where_clause = f" where {f}"
-        for table_name in table_names:
+        table_confs = [(t1,t1p), (t2, t2p)]
+
+        # where_clause = ''
+        # if t1p != 'None' and f != 'None':
+        #     where_clause = f" where {t1p} and {f}"
+        # elif t1p != 'None':
+        #     where_clause = f" where {t1p}"
+        # elif f != 'None':
+        #     where_clause = f" where {f}"
+
+        for (table_name,partition) in table_confs:
             sql = f'select * from {table_name}'
+            if any(cond != 'None' for cond in [partition, f]):
+                where_clause = ' where ' + ' and '.join(x for x in [partition, f] if x != 'None')
             sql += where_clause
             df = spark.sql(sql)
             row_count = df.count()
