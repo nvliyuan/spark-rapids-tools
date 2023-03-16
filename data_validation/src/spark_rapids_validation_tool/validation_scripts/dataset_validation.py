@@ -124,19 +124,13 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
     elif format == "hive":
         sql = f"select {pk} from {t1} except select {pk} from {t2}"
         where_clause = ""
-        if t1p != 'None' and f !='None':
-            where_clause = f" where {t1p} and {f}"
-        elif t1p != 'None':
-            where_clause = f" where {t1p}"
-        elif f != 'None':
-            where_clause = f" where {f}"
-        sql += where_clause
+        if any(cond is not None for cond in [t1p,t2p,f]):
+            where_clause = ' where ' + ' and '.join(x for x in [t1p, t2p, f] if x is not None and x != 'None')
 
-        print('------yua-debug-validat-----')
+        sql += where_clause
+        print('-----yuadebug---')
         print(sql)
         result = spark.sql(sql)
-        print(result.show())
-        print('------yua-debug-validat22-----')
         return result
 
     return
