@@ -194,7 +194,7 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
             if (any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in
                     ['*map*'])):
                 print('-----fnmatch.fnmatch-----')
-                map_cols += c.name
+                map_cols.append(c.name)
         print('-------yuadebug-map_cols-----')
         print(map_cols)
         normal_cols = list(set(table_DF1.columns) - set(map_cols))
