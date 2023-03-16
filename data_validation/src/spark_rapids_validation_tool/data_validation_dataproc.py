@@ -53,6 +53,12 @@ class DataValidationDataproc(Validation):
         self.valid_metadata()
         self.valid_data()
 
+    def format_conf_with_quotation(self,conf):
+        if conf is None:
+            return 'None'
+        else:
+            return conf.replace('\'', '\\\'')
+
     @on('master')  # pylint: disable=too-many-function-args
     def valid_metadata(self):
         """metadata validation spark via Dataproc job interface."""
@@ -61,11 +67,6 @@ class DataValidationDataproc(Validation):
             excluded_column = 'None'
         else:
             excluded_column = self.convert_tuple_to_string(self.excluded_column)
-
-        if self.filter is None:
-            filters = 'None'
-        else:
-            filters = self.filter.replace('\'', '\\\'')
 
         compare_job = {
             'type': self.cluster.JOB_TYPE_PYSPARK,
@@ -82,7 +83,7 @@ class DataValidationDataproc(Validation):
                 f'--i={self.convert_tuple_to_string(self.included_column)}',
                 f'--pk={self.pk}',
                 f'--e={excluded_column}',
-                f'--f={filters}',
+                f'--f={self.format_conf_with_quotation(self.filter)}',
                 f'--o={self.output_dir}',
                 f'--of={self.output_format}',
                 f'--p={self.precision}'
@@ -120,7 +121,7 @@ class DataValidationDataproc(Validation):
                 f'--i={self.convert_tuple_to_string(self.included_column)}',
                 f'--pk={self.pk}',
                 f'--e={self.excluded_column}',
-                f'--f={self.filter}',
+                f'--f={self.format_conf_with_quotation(self.filter)}',
                 f'--o={self.output_dir}',
                 f'--of={self.output_format}',
                 f'--p={self.precision}'
