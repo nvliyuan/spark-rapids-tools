@@ -196,10 +196,13 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
             cond = cond | ("t1." + c != "t2." + c)
         for c in map_cols:
             cond = cond | (map_to_string("t1." + c) != map_to_string("t2." + c))
-
+        print('-------yuadebug-cond-----')
+        print(cond)
         select_columns = [col('t1.' + p) for p in pk.split(',')] + [(col('t1.' + c).alias('t1_'+ c), col('t2.' + c).alias('t2_' + c)) for c in
                                                                included_columns_list if
                                                                c not in excluded_columns_list]
+        print('-------yuadebug-select_columns-----')
+        print(select_columns)
         result_table = joined_table.select(select_columns).where(cond)
 
         # if partitions != 'None':
