@@ -182,14 +182,19 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         table_DF1 = load_table(spark, format, table1_name, t1p, pk, excluded_columns, included_columns, filter, "table1")
         table_DF2 = load_table(spark, format, table2_name, t2p, pk, excluded_columns, included_columns, filter, "table2")
 
+        if included_columns == 'all':
+            included_columns_list = list(set(included_columns_list) - set(excluded_columns_list) - set(pk_list))
         joined_table = table_DF1.alias("t1").join(table_DF2.alias("t2"), pk_list)
 
         map_cols = []
         cond = True
         for c in table_DF1.schema.fields:
-            # here only excluded 'date' because it will raise exception, we also should excluded str/map/nested
+            print('----------')
+            print(c)
             if (any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in
                     ['map'])):
+                print('----------')
+
                 map_cols += c.name
         print('-------yuadebug-map_cols-----')
         print(map_cols)
