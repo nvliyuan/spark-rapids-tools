@@ -45,9 +45,6 @@ def validation(spark, args):
     save_result(result, args.o, args.of)
 
 def save_result(df, path, output_format):
-    print('--yuadebug----output--')
-    print(path)
-    print(output_format)
     df.write.mode("overwrite").format(output_format).save(path)
 
 def valid_input(spark, args):
