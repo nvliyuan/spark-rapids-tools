@@ -125,7 +125,7 @@ def generate_metric_df(spark, table_DF, i, e, t1):
     metrics_cols = [i.strip() for i in i.split(",") if i not in excluded_columns_list]
     if i in ['None', 'all']:
         metrics_cols = [c.name for c in table_DF.schema.fields if
-                        any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in ['*int*', '*decimal*', '*float*', '*double*'])]
+                        any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in ['*int*', '*decimal*', '*float*', '*double*', 'string'])]
     for col in metrics_cols:
         dfc = spark.createDataFrame(([col],), ["ColumnName"])
         table1_agg = table_DF.select(
