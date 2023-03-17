@@ -223,9 +223,9 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         print(select_columns)
         print('-------yuadebug-joined_table-----')
 
-        return joined_table.select(select_columns) # does not work??
+        # return joined_table.select(select_columns) # does not work??
         # return joined_table.select([col('t1.col1').alias("table1_pk"),col('t1.col2').alias("t1col2"),col('t2.col2').alias("t2col2")]) # works well
-        # result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
+        result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
 
         # if partitions != 'None':
         #     partitions = [p.strip() for p in partitions.split("and")]
@@ -238,7 +238,7 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         # Execute the query and return the result
         # result = spark.sql(sql)
 
-        # return result_table
+        return result_table
 
 def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
     if format in ['parquet', 'orc', 'csv']:
