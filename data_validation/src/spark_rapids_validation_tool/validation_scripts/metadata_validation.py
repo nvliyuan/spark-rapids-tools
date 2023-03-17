@@ -155,7 +155,11 @@ def metrics_metadata(spark, format, t1, t2, t1p, t2p, pk, i, e, f, p):
     table2_DF = load_table(spark, format, t2, t2p, pk, e, i, f, "")
 
     table_metric_df1 = generate_metric_df(spark, table1_DF, i, e, t1)
+    print('----table_metric_df1-------')
+    print(table_metric_df1.show())
     table_metric_df2 = generate_metric_df(spark, table2_DF, i, e, t2)
+    print('----table_metric_df2-------')
+    print(table_metric_df2.show())
     joined_table = table_metric_df1.alias("t1").join(table_metric_df2.alias("t2"), ["ColumnName"])
 
     cond = (round("t1.min" + t1, p) != round("t2.min" + t2, p)) | \

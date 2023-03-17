@@ -66,8 +66,6 @@ class DataprocWrapper(object):
 
         validate = DataValidationDataproc(cluster, region, check, format, t1, t1p, t2, t2p, pk, e, i, f, o, of, p, debug)
 
-        print('------t1p----')
-        print(t1p)
         if any(p is None for p in [cluster, region, t1, t2, format]):
             print('|--cluster/region/format/t1/t2 should not be none--|')
             return
