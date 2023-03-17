@@ -42,6 +42,11 @@ def validation(spark, args):
     print(result.show())
     print('|--------------run validation success-------|')
 
+    save_result(result, args.o, args.of)
+
+def save_result(df, path, output_format):
+    df.write.mode("overwrite").format(output_format).save(path)
+
 def valid_input(spark, args):
     """
     Check the input is valida for matadata validation tool
