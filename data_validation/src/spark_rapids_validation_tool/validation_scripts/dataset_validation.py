@@ -15,7 +15,7 @@
 import argparse
 from pyspark import SparkContext        # pylint: disable=import-error
 from pyspark.sql import SparkSession, DataFrame, functions as F    # pylint: disable=import-error
-from pyspark.sql.functions import col   # pylint: disable=import-error
+from pyspark.sql.functions import col, when   # pylint: disable=import-error
 import time
 from pyspark.sql.types import *
 import fnmatch
@@ -207,12 +207,15 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
             cond.append(map_to_string(col("t1." + c)) != map_to_string(col("t2." + c)))
         print('-------yuadebug-cond-----')
         print(cond)
-        # select_columns = [col('t1.' + p) for p in pk.split(',')] + [(col('t1.' + c).alias('t1_'+ c), col('t2.' + c).alias('t2_' + c)) for c in
-        #                                                        included_columns_list if
-        #                                                        c not in excluded_columns_list]
-        select_columns_list = [(col('t1.' + c).alias('t1_' + c), col('t2.' + c).alias('t2_' + c)) for c in
+
+        select_columns_list22 = [(col('t1.' + c).alias('t1_' + c), col('t2.' + c).alias('t2_' + c)) for c in
                                included_columns_list if
                                c not in excluded_columns_list]
+        select_columns_list = [(when(col('t1.' + c) != col('t2.' + c), col('t1.' + c)).otherwise('').alias('t1_' + c),
+                                when(col('t2.' + c) != col('t1.' + c), col('t2.' + c)).otherwise('').alias('t2_' + c)) for c in
+                               included_columns_list if
+                               c not in excluded_columns_list]
+
         ##flatten select_columns_list
         select_columns_flattened_list = [select_column for sublist in select_columns_list for select_column in sublist]
         select_columns = [col('t1.' + p) for p in pk.split(',')] + select_columns_flattened_list
