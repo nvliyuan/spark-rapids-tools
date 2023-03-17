@@ -38,12 +38,9 @@ def validation(spark, args):
 
     # valid result table with the same PK but different values for that column(s)
     result = get_cols_diff_with_same_pk(spark, args.format, args.t1, args.t2, args.pk, args.t1p, args.t2p, args.f, args.i, args.e, args.p)
-    # print("columns with same PK(s) but diff values : ")
+    print("|--Columns with same PK(s) but diff values :--|")
     print(result.show())
-    #
-    # start_time = time.time()
-    print('------------run validation success-----')
-
+    print('|--------------run validation success-------|')
 
 def valid_input(spark, args):
     """
@@ -190,23 +187,14 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         map_cols = []
         cond = []
         for c in table_DF1.schema.fields:
-            print('-----able_DF1.schema.fields-----')
-            print(c.dataType.simpleString())
             if (any(fnmatch.fnmatch(c.dataType.simpleString(), pattern) for pattern in
                     ['*map*'])):
-                print('-----fnmatch.fnmatch-----')
                 map_cols.append(c.name)
-        print('-------yuadebug-map_cols-----')
-        print(map_cols)
         normal_cols = list(set(table_DF1.columns) - set(map_cols))
-        print('-------yuadebug-normal_cols-----')
-        print(normal_cols)
         for c in normal_cols:
             cond.append(col("t1." + c) != col("t2." + c))
         for c in map_cols:
             cond.append(map_to_string(col("t1." + c)) != map_to_string(col("t2." + c)))
-        print('-------yuadebug-cond-----')
-        print(cond)
 
         normal_columns_list = [(when(col('t1.' + c) != col('t2.' + c), col('t1.' + c)).otherwise('').alias('t1_' + c),
                                 when(col('t2.' + c) != col('t1.' + c), col('t2.' + c)).otherwise('').alias('t2_' + c)) for c in
@@ -222,27 +210,8 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
         ##flatten select_columns_list
         select_columns_flattened_list = [select_column for sublist in select_columns_list for select_column in sublist]
         select_columns = [col('t1.' + p) for p in pk.split(',')] + select_columns_flattened_list
-        print('-------yuadebug-select_columns-----')
-        print(select_columns)
-        print('-------yuadebug-joined_table-----')
-        print('-------yuadebug-select_columns-----')
-        print(select_columns)
-        print('-------yuadebug-joined_table-----')
 
-        # return joined_table.select(select_columns) # does not work??
-        # return joined_table.select([col('t1.col1').alias("table1_pk"),col('t1.col2').alias("t1col2"),col('t2.col2').alias("t2col2")]) # works well
         result_table = joined_table.select(select_columns).where(reduce(lambda a, b: a | b,cond))
-
-        # if partitions != 'None':
-        #     partitions = [p.strip() for p in partitions.split("and")]
-        #     sql += ' AND ( ' + ' AND '.join([f't1.{p} ' for p in partitions]) + ' )'
-        #
-        # if filter != 'None':
-        #     filters = [f.strip() for f in filter.split("and")]
-        #     sql += ' AND ( ' + ' AND '.join([f't1.{f} ' for f in filters]) + ' )'
-
-        # Execute the query and return the result
-        # result = spark.sql(sql)
 
         return result_table
 
@@ -267,9 +236,7 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         spark.read.format(format).load(path).createOrReplaceTempView(view_name)
         sql += where_clause
         result = spark.sql(sql)
-        # result1 = spark.sql(sql1)
-        # print(result)
-        print(result)
+        return result
     elif format == "hive":
         excluded_columns_list = [exclude_column.strip() for exclude_column in e.split(",")]
         if i in ['None', 'all']:
@@ -283,11 +250,9 @@ def load_table(spark, format, t1, t1p, pk, e, i, f, view_name):
         if any(cond != 'None' for cond in [t1p, f]):
             where_clause = ' where ' + ' and '.join(x for x in [t1p, f] if x != 'None')
             sql += where_clause
-        print("--yuadebug----load hive table--")
-        print(sql)
+
         result = spark.sql(sql)
         return result
-
 
 def partition_to_path(partition_str, path):
     partition = {}
@@ -342,5 +307,3 @@ if __name__ == '__main__':
     spark = SparkSession(sc)
 
     validation(spark, args)
-
-
