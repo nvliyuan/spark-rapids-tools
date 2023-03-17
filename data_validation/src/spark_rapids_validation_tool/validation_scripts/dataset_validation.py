@@ -138,7 +138,7 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
         result = spark.sql(sql)
         return result
 
-
+    return
 
 def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p, t2p, filter, included_columns, excluded_columns, p):
     if format in ['parquet', 'orc', 'csv']:
