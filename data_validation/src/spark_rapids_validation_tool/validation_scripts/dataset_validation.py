@@ -30,16 +30,16 @@ def validation(spark, args):
     # valid PK(s) only in table1
     result = valid_pk_only_in_one_table(spark, args.format, args.t1, args.t2, args.t1p, args.t2p, args.pk, args.e, args.i, args.f, args.o, args.of)
     print(f'|--PK(s) only in {args.t1} :--|')
-    # print(result.show())
+    print(result.show())
     # valid PK(s) only in table2
     result = valid_pk_only_in_one_table(spark, args.format, args.t2, args.t1, args.t2p, args.t1p, args.pk, args.e, args.i, args.f, args.o, args.of)
     print(f'|--PK(s) only in {args.t2} :--|')
-    # print(result.show())
+    print(result.show())
 
     # valid result table with the same PK but different values for that column(s)
     result = get_cols_diff_with_same_pk(spark, args.format, args.t1, args.t2, args.pk, args.t1p, args.t2p, args.f, args.i, args.e, args.p)
     print("|--Columns with same PK(s) but diff values :--|")
-    # print(result.show())
+    print(result.show())
     print('|--------------run validation success-------|')
 
 def valid_input(spark, args):
@@ -138,7 +138,7 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
         result = spark.sql(sql)
         return result
 
-    return
+
 
 def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p, t2p, filter, included_columns, excluded_columns, p):
     if format in ['parquet', 'orc', 'csv']:
