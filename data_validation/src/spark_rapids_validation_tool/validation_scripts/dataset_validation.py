@@ -213,8 +213,8 @@ def get_cols_diff_with_same_pk(spark, format, table1_name, table2_name, pk, t1p,
                                normal_cols if
                                c not in excluded_columns_list and c not in pk_list]
 
-        map_columns_list = [(when(map_to_string(col('t1.' + c)) != map_to_string(col('t2.' + c)), col('t1.' + c)).otherwise('').alias('t1_' + c),
-                                when(map_to_string(col('t2.' + c)) != map_to_string(col('t1.' + c)), col('t2.' + c)).otherwise('').alias('t2_' + c))
+        map_columns_list = [(when(map_to_string(col('t1.' + c)) != map_to_string(col('t2.' + c)), map_to_string(col('t1.' + c))).otherwise('').alias('t1_' + c),
+                                when(map_to_string(col('t2.' + c)) != map_to_string(col('t1.' + c)), map_to_string(col('t2.' + c))).otherwise('').alias('t2_' + c))
                                for c in
                                map_cols if
                                c not in excluded_columns_list]
