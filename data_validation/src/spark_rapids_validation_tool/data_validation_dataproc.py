@@ -55,7 +55,7 @@ class DataValidationDataproc(Validation):
 
     def format_conf_with_quotation(self,conf):
         if conf is None:
-            return ''
+            return 'None'
         else:
             return conf.replace('\'', '\\\'')
 
