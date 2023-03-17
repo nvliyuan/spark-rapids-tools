@@ -132,11 +132,7 @@ def valid_pk_only_in_one_table(spark, format, t1, t2, t1p, t2p, pk, e, i, f, o, 
         if any(cond != 'None' for cond in [t2p,f]):
             where_clause = ' where ' + ' and '.join(x for x in [t2p, f] if x != 'None')
             sql2 += where_clause
-        print("------yuadebug--sql1---")
-        print(sql1)
         sql = sql1 + " except " + sql2
-        print("------yuadebug---sql2--")
-        print(sql2)
         result = spark.sql(sql)
         return result
 
