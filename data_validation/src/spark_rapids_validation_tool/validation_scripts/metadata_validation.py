@@ -98,7 +98,7 @@ def top_level_metadata(spark, format, t1, t2, t1p, t2p, f):
             sql = f'select * from {table_name}'
             if any(cond != 'None' for cond in [partition, f]):
                 where_clause = ' where ' + ' and '.join(x for x in [partition, f] if x != 'None')
-            sql += where_clause
+                sql += where_clause
             df = spark.sql(sql)
             row_count = df.count()
             col_count = len(df.columns)
